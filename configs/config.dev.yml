@@ -1,0 +1,59 @@
+app_id: "789"
+
+mssql_server:
+  address:
+    - "127.0.0.1:1433"
+  timeout: 10s
+  max_connection_idle: 60s
+  maxpoolsize: 200
+  username: "sa"
+  password: "P@ssw0rd"
+  database: "master"
+  auth_database: "master" # the database where the user is defined
+  tables:
+    transactions: "book"
+
+http_server:
+  read_timeout: 10s
+  write_timeout: 10s
+  read_header_timeout: 10s
+  shutdown_timeout: 10s
+
+redis:
+  addresses:
+    - "127.0.0.1:6379"
+  master_name: "redismaster"
+  secret_key: ""
+  ttl: 3600
+  dial_timeout: 5s
+  max_idle: 100
+  max_active: 3000
+  idle_timeout: 5s
+  password: "myredis"
+
+
+kafka_producer:
+  profile:
+    broker_list:
+      - "127.0.0.1:9092"
+    topics:
+      ph_test: "ph.ms.test.v1"
+    partition:
+      - "0"
+    max_retry: 5
+    delay_in_millisecond: 2000
+
+kafka_consumer:
+  profile:
+    broker_list:
+      - "127.0.0.1:9092"
+    topics:
+      - "ph.ms.test.v1"
+    consumer_group: "profile-service"
+    partition:
+      - "0"
+
+kafka_sasl:
+  username: ""
+  password: ""
+  is_enable: false
