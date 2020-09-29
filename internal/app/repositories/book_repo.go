@@ -27,7 +27,7 @@ type (
 		logger  klog.Logger
 	}
 
-	//BookRepository groups all function integrate with transaction collection in mssqldbdb
+	//BookRepository groups all function integrate with book collection in mssqldbdb
 	BookRepository interface {
 		GetBook(ctx context.Context, req models.GetBookRepoReq) (models.Book, error)
 		InsertBook(ctx context.Context, req models.InsertBookReq) (string, error)
@@ -104,50 +104,3 @@ func (tr *BookRepo) InsertBook(ctx context.Context, req models.InsertBookReq) (s
 	}
 	return id, nil
 }
-
-//
-//// InsertTransaction function
-//func (tr *TransactionsRepo) InsertTransaction(ctx context.Context, req models.InsertTransactionRepoReq) (int64, error) {
-//	var newID int64
-//	ctx = context.Background()
-//
-//	err := tr.s.Database.PingContext(ctx)
-//	if err != nil {
-//		return newID, tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
-//	}
-//	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
-//	tsql := fmt.Sprintf("INSERT INTO %s (transaction_name) VALUES (@transaction_name); select convert(bigint, SCOPE_IDENTITY());", db)
-//
-//	stmt, err := tr.s.Database.Prepare(tsql)
-//	if err != nil {
-//		return newID, tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
-//	}
-//	defer stmt.Close()
-//
-//	row := stmt.QueryRowContext(
-//		ctx,
-//		sql.Named("transaction_name", req.TransactionName),
-//	)
-//
-//	err = row.Scan(&newID)
-//	if err != nil {
-//		return newID, tr.errRepo.Wrap(err, kerrors.DatabaseScanErr, nil)
-//	}
-//
-//	return newID, nil
-//}
-
-// // UpdateOneTransaction function
-// func (tr *TransactionsRepo) UpdateOneTransaction(ctx context.Context, search, update bson.M) error {
-// 	count, err := tr.s.Database(tr.c.MSSQL.DatabaseName).Collection(tr.c.MSSQL.Tables.Transactions).UpdateOne(
-// 		context.Background(),
-// 		search,
-// 		update)
-// 	if err != nil {
-// 		return tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
-// 	}
-// 	if count.ModifiedCount == 0 {
-// 		return tr.errRepo.Wrap(errors.New("No data has been found"), kerrors.NotFoundItemInQuery, nil)
-// 	}
-// 	return nil
-// }

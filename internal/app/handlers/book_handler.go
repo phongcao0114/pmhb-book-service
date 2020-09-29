@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"pmhb-book-service/internal/app/config"
 	"pmhb-book-service/internal/app/response"
@@ -9,14 +10,16 @@ import (
 	"pmhb-book-service/internal/kerrors"
 	"pmhb-book-service/internal/pkg/klog"
 	"pmhb-book-service/models"
+
+	"github.com/gorilla/mux"
 )
 
 const (
-	// TransactionHandlerPrefix prefix logger
-	TransactionHandlerPrefix = "Transaction_handler"
+	// BookHandlerPrefix prefix logger
+	BookHandlerPrefix = "Book_handler"
 )
 
-// TransactionHandler struct defines the variables for specifying interface.
+// BookHandler struct defines the variables for specifying interface.
 type BookHandler struct {
 	conf       *config.Configs
 	errHandler kerrors.KError
@@ -25,12 +28,12 @@ type BookHandler struct {
 	srv services.BookService
 }
 
-// NewTransactionHandler connects to the service from handler.
+// NewBookHandler connects to the service from handler.
 func NewBookHandler(conf *config.Configs, s services.BookService) *BookHandler {
 	return &BookHandler{
 		conf:       conf,
-		errHandler: kerrors.WithPrefix(TransactionHandlerPrefix),
-		logger:     klog.WithPrefix(TransactionHandlerPrefix),
+		errHandler: kerrors.WithPrefix(BookHandlerPrefix),
+		logger:     klog.WithPrefix(BookHandlerPrefix),
 
 		srv: s,
 	}
@@ -38,16 +41,12 @@ func NewBookHandler(conf *config.Configs, s services.BookService) *BookHandler {
 
 // GetBook handler handles the upcoming request.
 func (th *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+	fmt.Println("id:", id)
 
-	var body models.GetBookReq
-	err := utils.DecodeToBody(&th.errHandler, &body, r)
-	if err != nil {
-		response.WriteJSON(w)(response.HandleError(r, err))
-		return
-	}
-
-	commitModels, err := th.srv.GetBook(r.Context(), &models.GetBookSrvReq{
-		ID: body.ID,
+	commitModels, err := th.srv.GetBook(r.Context(), models.GetBookSrvReq{
+		ID: id,
 	})
 	if err != nil {
 		response.WriteJSON(w)(response.HandleError(r, err))
@@ -69,7 +68,7 @@ func (th *BookHandler) InsertBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := th.srv.InsertBook(r.Context(), &models.InsertBookReq{
+	id, err := th.srv.InsertBook(r.Context(), models.InsertBookReq{
 		Name:   body.Name,
 		Author: body.Author,
 	})

@@ -40,7 +40,7 @@ func NewRouter(conf *config.Configs, dbconn *mssqldb.MSSQLConnections) (*mux.Rou
 		{
 			desc:    "API fot getting book",
 			method:  get,
-			path:    "/kph/api/book",
+			path:    "/kph/api/book/{id}",
 			handler: bookHandler.GetBook,
 		},
 		{
