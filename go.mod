@@ -6,12 +6,10 @@ require (
 	github.com/FZambia/sentinel v1.1.0 // indirect
 	github.com/Shopify/sarama v1.27.0 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200910202707-1e08a3fab204
-	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/jinzhu/now v1.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/viper v1.7.1
-	go.mongodb.org/mongo-driver v1.4.1 // indirect
 )
