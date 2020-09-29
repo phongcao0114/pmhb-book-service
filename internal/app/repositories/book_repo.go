@@ -29,7 +29,7 @@ type (
 
 	//BookRepository groups all function integrate with book collection in mssqldbdb
 	BookRepository interface {
-		GetBook(ctx context.Context, req models.GetBookRepoReq) (models.Book, error)
+		GetBookByID(ctx context.Context, req models.GetBookRepoReq) (models.Book, error)
 		InsertBook(ctx context.Context, req models.InsertBookReq) (string, error)
 	}
 )
@@ -45,8 +45,8 @@ func NewBookRepo(configs *config.Configs, s *mssqldb.MSSQLConnections) *BookRepo
 	}
 }
 
-// GetBook function
-func (tr *BookRepo) GetBook(ctx context.Context, req models.GetBookRepoReq) (models.Book, error) {
+// GetBookByID function
+func (tr *BookRepo) GetBookByID(ctx context.Context, req models.GetBookRepoReq) (models.Book, error) {
 	var book models.Book
 	ctx = context.Background()
 

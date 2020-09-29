@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"pmhb-book-service/internal/app/config"
 	"pmhb-book-service/internal/app/response"
@@ -40,12 +39,11 @@ func NewBookHandler(conf *config.Configs, s services.BookService) *BookHandler {
 }
 
 // GetBook handler handles the upcoming request.
-func (th *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
+func (th *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
-	fmt.Println("id:", id)
 
-	commitModels, err := th.srv.GetBook(r.Context(), models.GetBookSrvReq{
+	commitModels, err := th.srv.GetBookByID(r.Context(), models.GetBookSrvReq{
 		ID: id,
 	})
 	if err != nil {
