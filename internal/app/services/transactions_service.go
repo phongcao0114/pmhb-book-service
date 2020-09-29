@@ -25,7 +25,7 @@ type (
 
 	//BookService interface
 	BookService interface {
-		GetBook(ctx context.Context, req *models.GetBookSrvReq) ([]models.Book, error)
+		GetBook(ctx context.Context, req *models.GetBookSrvReq) (models.Book, error)
 		//InsertTransaction(ctx context.Context, req *models.InsertTransactionSrvReq) (models.InsertTransactionSrvRes, error)
 	}
 )
@@ -41,7 +41,7 @@ func NewBookService(conf *config.Configs, repo repositories.BookRepository) *Boo
 }
 
 // BookSrv function service
-func (tr *BookSrv) GetBook(ctx context.Context, req *models.GetBookSrvReq) ([]models.Book, error) {
+func (tr *BookSrv) GetBook(ctx context.Context, req *models.GetBookSrvReq) (models.Book, error) {
 	return tr.bookRepo.GetBook(ctx, models.GetBookRepoReq{
 		ID: req.ID,
 	})

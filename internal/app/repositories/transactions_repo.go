@@ -26,7 +26,7 @@ type (
 
 	//BookRepository groups all function integrate with transaction collection in mssqldbdb
 	BookRepository interface {
-		GetBook(ctx context.Context, req models.GetBookRepoReq) ([]models.Book, error)
+		GetBook(ctx context.Context, req models.GetBookRepoReq) (models.Book, error)
 		//InsertTransaction(ctx context.Context, req models.InsertTransactionRepoReq) (int64, error)
 	}
 )
@@ -43,13 +43,13 @@ func NewBookRepo(configs *config.Configs, s *mssqldb.MSSQLConnections) *BookRepo
 }
 
 // GetBook function
-func (tr *BookRepo) GetBook(ctx context.Context, req models.GetBookRepoReq) ([]models.Book, error) {
-	var dbList []models.Book
+func (tr *BookRepo) GetBook(ctx context.Context, req models.GetBookRepoReq) (models.Book, error) {
+	var book models.Book
 	ctx = context.Background()
 
 	err := tr.s.Database.PingContext(ctx)
 	if err != nil {
-		return dbList, tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
+		return book, tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
 	}
 
 	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
@@ -58,22 +58,21 @@ func (tr *BookRepo) GetBook(ctx context.Context, req models.GetBookRepoReq) ([]m
 	// Execute query
 	rows, err := tr.s.Database.QueryContext(ctx, tsql)
 	if err != nil {
-		return dbList, tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+		return book, tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
 	}
 
 	defer rows.Close()
 	// Iterate through the result set.
 	for rows.Next() {
 		// Get values from row.
-		var books models.Book
-		err := rows.Scan(&books.ID, &books.Name, &books.Author)
+		err := rows.Scan(&book.ID, &book.Name, &book.Author)
 		if err != nil {
-			return dbList, tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+			return book, tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
 		}
-		dbList = append(dbList, books)
+		//dbList = append(dbList, books)
 	}
 
-	return dbList, nil
+	return book, nil
 }
 
 //
