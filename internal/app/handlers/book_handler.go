@@ -43,9 +43,20 @@ func (th *BookHandler) GetBookByID(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
 
-	commitModels, err := th.srv.GetBookByID(r.Context(), models.GetBookSrvReq{
-		ID: id,
-	})
+	commitModels, err := th.srv.GetBookByID(r.Context(), id)
+	if err != nil {
+		response.WriteJSON(w)(response.HandleError(r, err))
+		return
+	}
+
+	response.WriteJSON(w)(response.HandleSuccess(r, commitModels))
+	return
+
+}
+
+// GetBook handler handles the upcoming request.
+func (th *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
+	commitModels, err := th.srv.GetBooks(r.Context())
 	if err != nil {
 		response.WriteJSON(w)(response.HandleError(r, err))
 		return
@@ -77,5 +88,42 @@ func (th *BookHandler) InsertBook(w http.ResponseWriter, r *http.Request) {
 
 	response.WriteJSON(w)(response.HandleSuccess(r, id))
 	return
+}
 
+func (th *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+
+	var body models.InsertBookReq
+	err := utils.DecodeToBody(&th.errHandler, &body, r)
+	if err != nil {
+		response.WriteJSON(w)(response.HandleError(r, err))
+		return
+	}
+
+	err = th.srv.UpdateBook(r.Context(), id, models.UpdateBookReq{
+		Name:   body.Name,
+		Author: body.Author,
+	})
+	if err != nil {
+		response.WriteJSON(w)(response.HandleError(r, err))
+		return
+	}
+
+	response.WriteJSON(w)(response.HandleSuccess(r, ""))
+	return
+}
+
+func (th *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+
+	err := th.srv.DeleteBook(r.Context(), id)
+	if err != nil {
+		response.WriteJSON(w)(response.HandleError(r, err))
+		return
+	}
+
+	response.WriteJSON(w)(response.HandleSuccess(r, ""))
+	return
 }

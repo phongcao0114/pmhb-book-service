@@ -29,8 +29,11 @@ type (
 
 	//BookRepository groups all function integrate with book collection in mssqldbdb
 	BookRepository interface {
-		GetBookByID(ctx context.Context, req models.GetBookRepoReq) (models.Book, error)
+		GetBookByID(ctx context.Context, id string) (models.Book, error)
+		GetBooks(ctx context.Context) ([]models.Book, error)
 		InsertBook(ctx context.Context, req models.InsertBookReq) (string, error)
+		UpdateBook(ctx context.Context, id string, req models.UpdateBookReq) error
+		DeleteBook(ctx context.Context, id string) error
 	}
 )
 
@@ -46,7 +49,7 @@ func NewBookRepo(configs *config.Configs, s *mssqldb.MSSQLConnections) *BookRepo
 }
 
 // GetBookByID function
-func (tr *BookRepo) GetBookByID(ctx context.Context, req models.GetBookRepoReq) (models.Book, error) {
+func (tr *BookRepo) GetBookByID(ctx context.Context, id string) (models.Book, error) {
 	var book models.Book
 	ctx = context.Background()
 
@@ -56,7 +59,7 @@ func (tr *BookRepo) GetBookByID(ctx context.Context, req models.GetBookRepoReq) 
 	}
 
 	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
-	tsql := fmt.Sprintf("SELECT id, name, author FROM %s WHERE id='%s';", db, req.ID)
+	tsql := fmt.Sprintf("SELECT id, name, author FROM %s WHERE id='%s';", db, id)
 	// Execute query
 	rows, err := tr.s.Database.QueryContext(ctx, tsql)
 	if err != nil {
@@ -75,6 +78,39 @@ func (tr *BookRepo) GetBookByID(ctx context.Context, req models.GetBookRepoReq) 
 	}
 
 	return book, nil
+}
+
+// GetBooks function
+func (tr *BookRepo) GetBooks(ctx context.Context) ([]models.Book, error) {
+	var books []models.Book
+	ctx = context.Background()
+
+	err := tr.s.Database.PingContext(ctx)
+	if err != nil {
+		return books, tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
+	}
+
+	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
+	tsql := fmt.Sprintf("SELECT id, name, author FROM %s;", db)
+	// Execute query
+	rows, err := tr.s.Database.QueryContext(ctx, tsql)
+	if err != nil {
+		return books, tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+	}
+
+	defer rows.Close()
+	// Iterate through the result set.
+	for rows.Next() {
+		// Get values from row.
+		var book models.Book
+		err := rows.Scan(&book.ID, &book.Name, &book.Author)
+		if err != nil {
+			return books, tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+		}
+		books = append(books, book)
+	}
+
+	return books, nil
 }
 
 func (tr *BookRepo) InsertBook(ctx context.Context, req models.InsertBookReq) (string, error) {
@@ -103,4 +139,60 @@ func (tr *BookRepo) InsertBook(ctx context.Context, req models.InsertBookReq) (s
 		return "", tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
 	}
 	return id, nil
+}
+
+func (tr *BookRepo) UpdateBook(ctx context.Context, id string, req models.UpdateBookReq) error {
+	var book models.Book
+	ctx = context.Background()
+
+	err := tr.s.Database.PingContext(ctx)
+	if err != nil {
+		return tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
+	}
+
+	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
+	tsql := fmt.Sprintf("UPDATE %s SET ", db)
+	if req.Name != "" {
+		tsql = tsql + fmt.Sprintf("name='%s',", req.Name)
+	}
+	if req.Author != "" {
+		tsql = tsql + fmt.Sprintf("author='%s',", req.Author)
+	}
+	tsql = tsql[:len(tsql)-1]
+	tsql = tsql + fmt.Sprintf(" WHERE id='%s'", id)
+	// Execute query
+	rows, err := tr.s.Database.QueryContext(ctx, tsql)
+	if err != nil {
+		return tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+	}
+
+	defer rows.Close()
+	// Iterate through the result set.
+	for rows.Next() {
+		// Get values from row.
+		err := rows.Scan(&book.ID, &book.Name, &book.Author)
+		if err != nil {
+			return tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+		}
+	}
+
+	return nil
+}
+
+func (tr *BookRepo) DeleteBook(ctx context.Context, id string) error {
+	ctx = context.Background()
+
+	err := tr.s.Database.PingContext(ctx)
+	if err != nil {
+		return tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
+	}
+
+	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
+	tsql := fmt.Sprintf("DELETE FROM %s WHERE id='%s';", db, id)
+	// Execute query
+	_, err = tr.s.Database.ExecContext(ctx, tsql)
+	if err != nil {
+		return tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+	}
+	return nil
 }

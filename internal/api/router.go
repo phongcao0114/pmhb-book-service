@@ -14,8 +14,10 @@ import (
 )
 
 const (
-	get  = http.MethodGet
-	post = http.MethodPost
+	get    = http.MethodGet
+	post   = http.MethodPost
+	put    = http.MethodPut
+	delete = http.MethodDelete
 )
 
 // NewRouter return new mux router with a closer for cleaning up underlying resources
@@ -38,6 +40,12 @@ func NewRouter(conf *config.Configs, dbconn *mssqldb.MSSQLConnections) (*mux.Rou
 			},
 		},
 		{
+			desc:    "API fot getting book list",
+			method:  get,
+			path:    "/kph/api/book",
+			handler: bookHandler.GetBooks,
+		},
+		{
 			desc:    "API fot getting book",
 			method:  get,
 			path:    "/kph/api/book/{id}",
@@ -48,6 +56,18 @@ func NewRouter(conf *config.Configs, dbconn *mssqldb.MSSQLConnections) (*mux.Rou
 			method:  post,
 			path:    "/kph/api/book",
 			handler: bookHandler.InsertBook,
+		},
+		{
+			desc:    "API for updating book",
+			method:  put,
+			path:    "/kph/api/book/{id}",
+			handler: bookHandler.UpdateBook,
+		},
+		{
+			desc:    "API for deleting book",
+			method:  delete,
+			path:    "/kph/api/book/{id}",
+			handler: bookHandler.DeleteBook,
 		},
 	}
 	router.Use(middlewares.Recover)

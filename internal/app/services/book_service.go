@@ -25,8 +25,11 @@ type (
 
 	//BookService interface
 	BookService interface {
-		GetBookByID(ctx context.Context, req models.GetBookSrvReq) (models.Book, error)
+		GetBookByID(ctx context.Context, id string) (models.Book, error)
 		InsertBook(ctx context.Context, req models.InsertBookReq) (string, error)
+		GetBooks(ctx context.Context) ([]models.Book, error)
+		UpdateBook(ctx context.Context, id string, req models.UpdateBookReq) error
+		DeleteBook(ctx context.Context, id string) error
 	}
 )
 
@@ -41,15 +44,24 @@ func NewBookService(conf *config.Configs, repo repositories.BookRepository) *Boo
 }
 
 // GetBook func
-func (tr *BookSrv) GetBookByID(ctx context.Context, req models.GetBookSrvReq) (models.Book, error) {
-	return tr.bookRepo.GetBookByID(ctx, models.GetBookRepoReq{
-		ID: req.ID,
-	})
+func (tr *BookSrv) GetBookByID(ctx context.Context, id string) (models.Book, error) {
+	return tr.bookRepo.GetBookByID(ctx, id)
 }
 
+// InsertBook func
 func (tr *BookSrv) InsertBook(ctx context.Context, req models.InsertBookReq) (string, error) {
-	return tr.bookRepo.InsertBook(ctx, models.InsertBookReq{
-		Name:   req.Name,
-		Author: req.Author,
-	})
+	return tr.bookRepo.InsertBook(ctx, req)
+}
+
+// InsertBook func
+func (tr *BookSrv) GetBooks(ctx context.Context) ([]models.Book, error) {
+	return tr.bookRepo.GetBooks(ctx)
+}
+
+func (tr *BookSrv) UpdateBook(ctx context.Context, id string, req models.UpdateBookReq) error {
+	return tr.bookRepo.UpdateBook(ctx, id, req)
+}
+
+func (tr *BookSrv) DeleteBook(ctx context.Context, id string) error {
+	return tr.bookRepo.DeleteBook(ctx, id)
 }
