@@ -7,6 +7,7 @@ require (
 	github.com/Shopify/sarama v1.27.0 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200910202707-1e08a3fab204
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
+	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0
 	github.com/jinzhu/now v1.1.1
 	github.com/pkg/errors v0.9.1

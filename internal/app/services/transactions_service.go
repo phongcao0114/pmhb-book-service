@@ -3,10 +3,10 @@ package services
 import (
 	"context"
 	"pmhb-book-service/internal/app/config"
-	"pmhb-book-service/internal/app/models"
 	"pmhb-book-service/internal/app/repositories"
 	"pmhb-book-service/internal/kerrors"
 	"pmhb-book-service/internal/pkg/klog"
+	"pmhb-book-service/models"
 )
 
 const (
@@ -26,7 +26,7 @@ type (
 	//BookService interface
 	BookService interface {
 		GetBook(ctx context.Context, req *models.GetBookSrvReq) (models.Book, error)
-		//InsertTransaction(ctx context.Context, req *models.InsertTransactionSrvReq) (models.InsertTransactionSrvRes, error)
+		InsertBook(ctx context.Context, req *models.InsertBookReq) (string, error)
 	}
 )
 
@@ -44,6 +44,13 @@ func NewBookService(conf *config.Configs, repo repositories.BookRepository) *Boo
 func (tr *BookSrv) GetBook(ctx context.Context, req *models.GetBookSrvReq) (models.Book, error) {
 	return tr.bookRepo.GetBook(ctx, models.GetBookRepoReq{
 		ID: req.ID,
+	})
+}
+
+func (tr *BookSrv) InsertBook(ctx context.Context, req *models.InsertBookReq) (string, error) {
+	return tr.bookRepo.InsertBook(ctx, models.InsertBookReq{
+		Name:   req.Name,
+		Author: req.Author,
 	})
 }
 

@@ -1,5 +1,5 @@
 FROM common-docker.artifactory.kasikornbank.com:8443/golang:1.15.0
-LABEL vendor="kbtg" project="pmhb"
+LABEL vendor="kbtg" project="pmhb-book-service"
 
 WORKDIR /go/src/app  
 ENV PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin  
@@ -24,5 +24,5 @@ COPY deployment/docker/assets/zoneinfo.zip /usr/lib/go-1.15/lib/time/zoneinfo.zi
 COPY deployment/docker/assets/httpstat /usr/bin/httpstat
 RUN chmod +x /usr/bin/httpstat
 
-EXPOSE 10000
-CMD ["./pmhb.bin", "-port", "10000", "-config", "/go/src/app/configs/"]
+EXPOSE 8080
+CMD ["./pmhb-book-service.bin", "-port", "8080", "-config", "/go/src/app/configs/"]

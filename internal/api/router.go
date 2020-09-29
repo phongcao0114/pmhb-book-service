@@ -38,17 +38,17 @@ func NewRouter(conf *config.Configs, dbconn *mssqldb.MSSQLConnections) (*mux.Rou
 			},
 		},
 		{
-			desc:    "Get API for payment hub",
+			desc:    "API fot getting book",
 			method:  get,
-			path:    "/kph/api/book/get",
+			path:    "/kph/api/book",
 			handler: bookHandler.GetBook,
 		},
-		//{
-		//	desc:    "Set API for payment hub",
-		//	method:  post,
-		//	path:    "/kph/api/set",
-		//	handler: transactionHandler.InsertTransaction,
-		//},
+		{
+			desc:    "API for inserting book",
+			method:  post,
+			path:    "/kph/api/book",
+			handler: bookHandler.InsertBook,
+		},
 	}
 	router.Use(middlewares.Recover)
 	router.Use(middlewares.AcceptLanguage)

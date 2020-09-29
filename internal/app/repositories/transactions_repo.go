@@ -2,12 +2,15 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"pmhb-book-service/internal/app/config"
-	"pmhb-book-service/internal/app/models"
 	"pmhb-book-service/internal/kerrors"
 	"pmhb-book-service/internal/pkg/db/mssqldb"
 	"pmhb-book-service/internal/pkg/klog"
+	"pmhb-book-service/models"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -27,7 +30,7 @@ type (
 	//BookRepository groups all function integrate with transaction collection in mssqldbdb
 	BookRepository interface {
 		GetBook(ctx context.Context, req models.GetBookRepoReq) (models.Book, error)
-		//InsertTransaction(ctx context.Context, req models.InsertTransactionRepoReq) (int64, error)
+		InsertBook(ctx context.Context, req models.InsertBookReq) (string, error)
 	}
 )
 
@@ -53,8 +56,7 @@ func (tr *BookRepo) GetBook(ctx context.Context, req models.GetBookRepoReq) (mod
 	}
 
 	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
-	tsql := fmt.Sprintf("SELECT id, name, author FROM %s WHERE id=%s;", db, req.ID)
-	fmt.Println("tsql:", tsql)
+	tsql := fmt.Sprintf("SELECT id, name, author FROM %s WHERE id='%s';", db, req.ID)
 	// Execute query
 	rows, err := tr.s.Database.QueryContext(ctx, tsql)
 	if err != nil {
@@ -73,6 +75,34 @@ func (tr *BookRepo) GetBook(ctx context.Context, req models.GetBookRepoReq) (mod
 	}
 
 	return book, nil
+}
+
+func (tr *BookRepo) InsertBook(ctx context.Context, req models.InsertBookReq) (string, error) {
+	id := uuid.New().String()
+	ctx = context.Background()
+
+	err := tr.s.Database.PingContext(ctx)
+	if err != nil {
+		return "", tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
+	}
+	db := fmt.Sprintf("%s.%s.%s", tr.c.MSSQL.DatabaseName, "dbo", tr.c.MSSQL.Tables.Transactions)
+	tsql := fmt.Sprintf("INSERT INTO %s VALUES (@id,@name,@author)", db)
+	stmt, err := tr.s.Database.Prepare(tsql)
+	if err != nil {
+		return "", tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(
+		ctx,
+		sql.Named("id", id),
+		sql.Named("name", req.Name),
+		sql.Named("author", req.Author),
+	)
+	if err != nil {
+		return "", tr.errRepo.Wrap(err, kerrors.DatabaseServerError, nil)
+	}
+	return id, nil
 }
 
 //

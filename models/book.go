@@ -1,4 +1,4 @@
-package model
+package models
 
 type (
 	// Book structure
@@ -18,5 +18,9 @@ type (
 	// GetBookReq structure
 	GetBookReq struct {
 		ID string `json:"id"`
+	}
+	InsertBookReq struct {
+		Name   string `json:"name"`
+		Author string `json:"author"`
 	}
 )

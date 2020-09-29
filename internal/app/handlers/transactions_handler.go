@@ -3,12 +3,12 @@ package handlers
 import (
 	"net/http"
 	"pmhb-book-service/internal/app/config"
-	"pmhb-book-service/internal/app/models"
 	"pmhb-book-service/internal/app/response"
 	"pmhb-book-service/internal/app/services"
 	"pmhb-book-service/internal/app/utils"
 	"pmhb-book-service/internal/kerrors"
 	"pmhb-book-service/internal/pkg/klog"
+	"pmhb-book-service/models"
 )
 
 const (
@@ -59,26 +59,26 @@ func (th *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//
-//// InsertTransaction handler handles the upcoming request.
-//func (th *TransactionHandler) InsertTransaction(w http.ResponseWriter, r *http.Request) {
-//
-//	var body models.InsertTransactionReq
-//	err := utils.DecodeToBody(&th.errHandler, &body, r)
-//	if err != nil {
-//		response.WriteJSON(w)(response.HandleError(r, err))
-//		return
-//	}
-//
-//	commitModels, err := th.srv.InsertTransaction(r.Context(), &models.InsertTransactionSrvReq{
-//		TransactionName: body.TransactionName,
-//	})
-//	if err != nil {
-//		response.WriteJSON(w)(response.HandleError(r, err))
-//		return
-//	}
-//
-//	response.WriteJSON(w)(response.HandleSuccess(r, commitModels))
-//	return
-//
-//}
+// InsertBook handler handles the upcoming request.
+func (th *BookHandler) InsertBook(w http.ResponseWriter, r *http.Request) {
+
+	var body models.InsertBookReq
+	err := utils.DecodeToBody(&th.errHandler, &body, r)
+	if err != nil {
+		response.WriteJSON(w)(response.HandleError(r, err))
+		return
+	}
+
+	id, err := th.srv.InsertBook(r.Context(), &models.InsertBookReq{
+		Name:   body.Name,
+		Author: body.Author,
+	})
+	if err != nil {
+		response.WriteJSON(w)(response.HandleError(r, err))
+		return
+	}
+
+	response.WriteJSON(w)(response.HandleSuccess(r, id))
+	return
+
+}
