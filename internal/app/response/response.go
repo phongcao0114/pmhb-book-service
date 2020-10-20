@@ -34,14 +34,15 @@ func HandleError(r *http.Request, err error) (interface{}, int) {
 	case kerrors.KError:
 		logger.WithFields(v.Extract()).KError(ctx, v.LogMessage)
 
-		errCode, errMsg := v.Code.String(), v.Message.String()
+		errCode, errMsg, originalErrorStr := v.Code.String(), v.Message.String(), v.OriginalErrorStr
 		res = utils.KbankResponseHeader{
 			ResponseAppID: utils.ResponseAppID,
 			ResponseDate:  time.Now(),
 			StatusCode:    kerrors.StatusErrorFailed.String(),
 			Errors: utils.ResponseErrorKbankHeader{
-				ErrorCode: errCode,
-				ErrorDesc: errMsg,
+				ErrorCode:        errCode,
+				ErrorDesc:        errMsg,
+				OriginalErrorStr: originalErrorStr,
 			},
 		}
 	default:
@@ -61,5 +62,8 @@ func HandleSuccess(r *http.Request, data interface{}) (interface{}, int) {
 	temp := r.WithContext(c)
 	*r = *temp
 
+	if r.Method == http.MethodPost {
+		return rs, http.StatusCreated
+	}
 	return rs, http.StatusOK
 }

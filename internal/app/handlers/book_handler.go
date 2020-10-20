@@ -69,14 +69,12 @@ func (th *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 
 // InsertBook handler handles the upcoming request.
 func (th *BookHandler) InsertBook(w http.ResponseWriter, r *http.Request) {
-
 	var body models.InsertBookReq
 	err := utils.DecodeToBody(&th.errHandler, &body, r)
 	if err != nil {
 		response.WriteJSON(w)(response.HandleError(r, err))
 		return
 	}
-
 	id, err := th.srv.InsertBook(r.Context(), models.InsertBookReq{
 		Name:   body.Name,
 		Author: body.Author,
@@ -110,7 +108,7 @@ func (th *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.WriteJSON(w)(response.HandleSuccess(r, ""))
+	response.WriteJSON(w)(response.HandleSuccess(r, true))
 	return
 }
 
@@ -124,6 +122,6 @@ func (th *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.WriteJSON(w)(response.HandleSuccess(r, ""))
+	response.WriteJSON(w)(response.HandleSuccess(r, true))
 	return
 }

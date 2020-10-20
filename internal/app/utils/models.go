@@ -20,7 +20,8 @@ type (
 
 	// ResponseErrorKbankHeader struct contains response error header
 	ResponseErrorKbankHeader struct {
-		ErrorCode string `json:"error_code"`
-		ErrorDesc string `json:"error_desc"`
+		ErrorCode        string `json:"error_code"`
+		ErrorDesc        string `json:"error_desc"`
+		OriginalErrorStr string `json:"original_error_str"`
 	}
 )

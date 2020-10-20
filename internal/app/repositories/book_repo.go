@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"pmhb-book-service/internal/app/config"
 	"pmhb-book-service/internal/kerrors"
@@ -80,7 +81,7 @@ func (tr *BookRepo) GetBookByID(ctx context.Context, id string) (models.Book, er
 	return book, nil
 }
 
-// GetBooks function
+//GetBooks function
 func (tr *BookRepo) GetBooks(ctx context.Context) ([]models.Book, error) {
 	var books []models.Book
 	ctx = context.Background()
@@ -113,7 +114,18 @@ func (tr *BookRepo) GetBooks(ctx context.Context) ([]models.Book, error) {
 	return books, nil
 }
 
+//func (tr *BookRepo) GetBooks(ctx context.Context) ([]models.Book, error) {
+//	err := errors.New("this is error")
+//	return []models.Book{}, tr.errRepo.Wrap(err, kerrors.CannotGetDataFromDB, nil)
+//}
+
 func (tr *BookRepo) InsertBook(ctx context.Context, req models.InsertBookReq) (string, error) {
+	if req.Name == "" {
+		return "", tr.errRepo.Wrap(errors.New("name is missing"), kerrors.ValidateFailed, nil)
+	}
+	if req.Author == "" {
+		return "", tr.errRepo.Wrap(errors.New("author is missing"), kerrors.ValidateFailed, nil)
+	}
 	id := uuid.New().String()
 	ctx = context.Background()
 
@@ -167,6 +179,7 @@ func (tr *BookRepo) UpdateBook(ctx context.Context, id string, req models.Update
 	}
 
 	defer rows.Close()
+	fmt.Printf("rows: %+v\n", rows)
 	// Iterate through the result set.
 	for rows.Next() {
 		// Get values from row.
