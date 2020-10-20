@@ -10,7 +10,7 @@ import (
 	"pmhb-book-service/internal/api"
 	"pmhb-book-service/internal/app/config"
 	"pmhb-book-service/internal/app/utils"
-	"pmhb-book-service/internal/pkg/db/mssqldb"
+	"pmhb-book-service/internal/pkg/db/mariadb"
 	"pmhb-book-service/internal/pkg/klog"
 
 	"strings"
@@ -60,16 +60,16 @@ func main() {
 	}
 	utils.BKKLocation = bkkLocation
 
-	// 7. Connecting to MSSQL
-	mssqlDBClient, err := mssqldb.NewDatabaseConnection(config.Config)
+	// 7. Connecting to mariadb
+	mariaDBClient, err := mariadb.NewDatabaseConnection(config.Config)
 	if err != nil {
-		KLogger.Panicf("[main] Failed to connect to MSSQL, err: %v", err)
+		KLogger.Panicf("[main] Failed to connect to MariaDB, err: %v", err)
 	}
 
 	srvCtx, srvCancel := context.WithCancel(context.Background())
 
 	// 8. Start http server
-	router, err := api.NewRouter(config.Config, mssqlDBClient)
+	router, err := api.NewRouter(config.Config, mariaDBClient)
 	if err != nil {
 		KLogger.Errorf("failed to init router, err: %v", err)
 	}

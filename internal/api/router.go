@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"pmhb-book-service/internal/app/config"
+	"pmhb-book-service/internal/pkg/db/mariadb"
 
-	"pmhb-book-service/internal/pkg/db/mssqldb"
 	"pmhb-book-service/internal/pkg/middlewares"
 
 	"github.com/gorilla/mux"
@@ -21,7 +21,7 @@ const (
 )
 
 // NewRouter return new mux router with a closer for cleaning up underlying resources
-func NewRouter(conf *config.Configs, dbconn *mssqldb.MSSQLConnections) (*mux.Router, error) {
+func NewRouter(conf *config.Configs, dbconn *mariadb.MariaDBConnections) (*mux.Router, error) {
 
 	// Book handler API
 	bookHandler := CreateBookHandler(conf, dbconn)
